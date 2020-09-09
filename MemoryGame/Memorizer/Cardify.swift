@@ -12,7 +12,7 @@ import SwiftUI
 struct Cardify: ViewModifier {
     var isFaceUp: Bool
     var isMatched: Bool
-    
+
     func body(content: Content) -> some View {
         ZStack {
             if isFaceUp {
