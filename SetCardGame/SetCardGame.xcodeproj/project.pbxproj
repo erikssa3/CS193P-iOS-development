@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		440F65C02516022000F7AAF9 /* Array+Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440F65BF2516022000F7AAF9 /* Array+Hashable.swift */; };
 		44C450B72508FA0800C0FA75 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C450B62508FA0800C0FA75 /* AppDelegate.swift */; };
 		44C450B92508FA0800C0FA75 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C450B82508FA0800C0FA75 /* SceneDelegate.swift */; };
 		44C450BB2508FA0800C0FA75 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C450BA2508FA0800C0FA75 /* SetGameView.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		440F65BF2516022000F7AAF9 /* Array+Hashable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Hashable.swift"; sourceTree = "<group>"; };
 		44C450B32508FA0800C0FA75 /* SetCardGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SetCardGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44C450B62508FA0800C0FA75 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		44C450B82508FA0800C0FA75 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				44C450BA2508FA0800C0FA75 /* SetGameView.swift */,
 				44C450D72509424400C0FA75 /* Grid.swift */,
 				44C450D92509433D00C0FA75 /* Array+Identifiable.swift */,
+				440F65BF2516022000F7AAF9 /* Array+Hashable.swift */,
 				44C450CB2509045700C0FA75 /* GridLayout.swift */,
 				44C450BC2508FA0800C0FA75 /* Assets.xcassets */,
 				44C450C12508FA0800C0FA75 /* LaunchScreen.storyboard */,
@@ -165,6 +168,7 @@
 				44C450B92508FA0800C0FA75 /* SceneDelegate.swift in Sources */,
 				44C450D125091B1500C0FA75 /* SetGame.swift in Sources */,
 				44C450CD2509045700C0FA75 /* GridLayout.swift in Sources */,
+				440F65C02516022000F7AAF9 /* Array+Hashable.swift in Sources */,
 				44C450D625093D9000C0FA75 /* SetCardGame.swift in Sources */,
 				44C450DA2509433D00C0FA75 /* Array+Identifiable.swift in Sources */,
 				44C450D82509424400C0FA75 /* Grid.swift in Sources */,

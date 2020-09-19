@@ -9,10 +9,12 @@
 import SwiftUI
 
 struct SetGameView: View {
-    var game: SetCardGame
+    @ObservedObject var game: SetCardGame
     var body: some View {
         return Grid(game.cards) { card in
-            Card(card: card)
+            Card(card: card).onTapGesture {
+                self.game.choose(card: card)
+            }
         }.padding()
     }
 }
@@ -30,24 +32,36 @@ struct Card: View {
     
     private func body(for size: CGSize) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius).fill(Color.white)
-            RoundedRectangle(cornerRadius: cornerRadius).stroke(lineWidth: edgeLineWidth)
+            RoundedRectangle(cornerRadius: cornerRadius).fill(card.status == CardStatus.selected ? Color.gray : Color.white)
+            RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor(card: card), lineWidth: edgeLineWidth)
             VStack {
                 ForEach(0..<card.shapeCount) { _ in
-                    self.containedView(card: self.card)
+                    self.cardShape(card: self.card)
                         .frame(width: size.width * self.widthFactor, height: size.height * self.heightFactor)
                 }
-            }.padding(.vertical)
+            }
+            .padding(.vertical)
         }
         .padding(5)
         .aspectRatio(2/3, contentMode: .fit)
     }
     
-    func containedView(card: SetGame.Card) -> AnyView {
+    func borderColor(card: SetGame.Card) -> Color {
+        switch card.status {
+        case .partOfValidSet:
+            return Color.green
+        case .partOfInvalidSet:
+            return Color.red
+        default:
+            return Color.black
+        }
+    }
+    
+    func cardShape(card: SetGame.Card) -> some View {
         switch card.shape {
-        case .diamond: return AnyView(Diamond().fill(self.getColor(color: card.color)))
-        case .oval: return AnyView(RoundedRectangle(cornerRadius: 30.0).fill(self.getColor(color: card.color)))
-        default: return AnyView(RoundedRectangle(cornerRadius: 2).fill(self.getColor(color: card.color)))
+        case .diamond: return self.drawDiamond(card: card)
+        case .oval: return drawOval(card: card)
+        default: return drawRectangle(card: card)
         }
     }
     
@@ -59,11 +73,50 @@ struct Card: View {
         }
     }
     
+    func drawDiamond(card: SetGame.Card) -> AnyView {
+        switch card.shading {
+        case .solid:
+            return AnyView(Diamond().fill(self.getColor(color: card.color)))
+        case .opaque:
+            return AnyView(Diamond().fill(self.getColor(color: card.color)).opacity(0.4))
+        default:
+            return AnyView(Diamond().stroke(self.getColor(color: card.color)))
+        }
+    }
+    
+    func drawOval(card: SetGame.Card) -> AnyView {
+        switch card.shading {
+        case .solid:
+            return AnyView(RoundedRectangle(cornerRadius: 30.0).fill(self.getColor(color: card.color)))
+        case .opaque:
+            return AnyView(RoundedRectangle(cornerRadius: 30.0).fill(self.getColor(color: card.color)).opacity(0.4))
+        default:
+            return AnyView(RoundedRectangle(cornerRadius: 30.0).stroke(self.getColor(color: card.color)))
+        }
+    }
+    
+    func drawRectangle(card: SetGame.Card) -> AnyView {
+        switch card.shading {
+        case .solid:
+            return AnyView(RoundedRectangle(cornerRadius: 2).fill(self.getColor(color: card.color)))
+        case .opaque:
+            return AnyView(RoundedRectangle(cornerRadius: 2).fill(self.getColor(color: card.color)).opacity(0.4))
+        default:
+            return AnyView(RoundedRectangle(cornerRadius: 2).stroke(self.getColor(color: card.color)))
+        }
+    }
+    
     let widthFactor: CGFloat = 0.7
     let heightFactor: CGFloat = 0.2
     let cornerRadius: CGFloat = 12.0
     let edgeLineWidth: CGFloat = 3
 }
+
+struct CardShapeView {
+    var card: SetGame.Card
+    
+}
+
 
 struct Diamond: Shape {
     

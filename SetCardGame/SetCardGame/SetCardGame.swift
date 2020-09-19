@@ -14,6 +14,11 @@ class SetCardGame: ObservableObject {
     @Published private var model = SetGame()
     
     var cards: [SetGame.Card] {
-        Array(model.cards.shuffled().prefix(12))
+        model.cardsBy(statuses: [.onScreen, .partOfInvalidSet, .partOfValidSet, .selected])
+    }
+    
+    
+    func choose(card: SetGame.Card) {
+        model.choose(card: card)
     }
 }
