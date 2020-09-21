@@ -9,24 +9,6 @@
 import Foundation
 import SwiftUI
 
-enum SetGameShape: CaseIterable {
-    case diamond
-    case oval
-    case rectangle
-}
-
-enum SetGameColor: CaseIterable {
-    case green
-    case red
-    case blue
-}
-
-enum SetGameShading: CaseIterable {
-    case solid
-    case opaque
-    case open
-}
-
 enum CardStatus {
     case inPack
     case onScreen
@@ -36,10 +18,8 @@ enum CardStatus {
     case removed
 }
 
-let shapeCount = 3
 
-
-struct SetGame {
+struct SetGame<CardContent> where CardContent: Hashable {
     private (set) var cards: [Card] = []
 
     func cardsBy(status: CardStatus) -> [Card]   {
@@ -58,9 +38,9 @@ struct SetGame {
         return cardsBy(status: .partOfValidSet).count == 3
     }
 
-    init() {
+    init(cardContents: [CardContent])  {
         var cardId = 0
-        for shape in SetGameShape.allCases {
+        for shape in cardContents {
             for count in 1...shapeCount {
                 for color in SetGameColor.allCases {
                     for shading in SetGameShading.allCases {
@@ -138,7 +118,7 @@ struct SetGame {
         var status: CardStatus = .inPack
         var isShown: Bool = false
         var shapeCount: Int
-        var shape: SetGameShape
+        var shape: CardContent
         var color: SetGameColor
         var shading: SetGameShading
     }

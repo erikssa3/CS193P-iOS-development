@@ -9,9 +9,9 @@
 import SwiftUI
 
 struct SetGameView: View {
-    @ObservedObject var game: SetCardGame
+    @ObservedObject var game: ShapeSetGame
     var body: some View {
-        return Grid(game.cards) { card in
+        return Grid(game.cards) { (card: SetGame<SetShape>.Card) in
             Card(card: card).onTapGesture {
                 self.game.choose(card: card)
             }
@@ -22,7 +22,7 @@ struct SetGameView: View {
 
 
 struct Card: View {
-    var card: SetGame.Card
+    var card: SetGame<SetShape>.Card
     
     var body: some View {
         GeometryReader { geometry in
@@ -36,9 +36,16 @@ struct Card: View {
             RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor(card: card), lineWidth: edgeLineWidth)
             VStack {
                 ForEach(0..<card.shapeCount) { _ in
-                    self.cardShape(card: self.card)
-                        .frame(width: size.width * self.widthFactor, height: size.height * self.heightFactor)
+                    if self.card.shading == .solid || self.card.shading == .opaque {
+                        self.card.shape
+                            .fill(self.getColor(color: self.card.color))
+                            .opacity(self.card.shading == .opaque ? 0.4 : 1)
+                    } else {
+                        self.card.shape
+                            .stroke(self.getColor(color: self.card.color))
+                    }
                 }
+                .frame(width: size.width * self.widthFactor, height: size.height * self.heightFactor)
             }
             .padding(.vertical)
         }
@@ -46,7 +53,7 @@ struct Card: View {
         .aspectRatio(2/3, contentMode: .fit)
     }
     
-    func borderColor(card: SetGame.Card) -> Color {
+    func borderColor(card: SetGame<SetShape>.Card) -> Color {
         switch card.status {
         case .partOfValidSet:
             return Color.green
@@ -54,14 +61,6 @@ struct Card: View {
             return Color.red
         default:
             return Color.black
-        }
-    }
-    
-    func cardShape(card: SetGame.Card) -> some View {
-        switch card.shape {
-        case .diamond: return self.drawDiamond(card: card)
-        case .oval: return drawOval(card: card)
-        default: return drawRectangle(card: card)
         }
     }
     
@@ -73,39 +72,6 @@ struct Card: View {
         }
     }
     
-    func drawDiamond(card: SetGame.Card) -> AnyView {
-        switch card.shading {
-        case .solid:
-            return AnyView(Diamond().fill(self.getColor(color: card.color)))
-        case .opaque:
-            return AnyView(Diamond().fill(self.getColor(color: card.color)).opacity(0.4))
-        default:
-            return AnyView(Diamond().stroke(self.getColor(color: card.color)))
-        }
-    }
-    
-    func drawOval(card: SetGame.Card) -> AnyView {
-        switch card.shading {
-        case .solid:
-            return AnyView(RoundedRectangle(cornerRadius: 30.0).fill(self.getColor(color: card.color)))
-        case .opaque:
-            return AnyView(RoundedRectangle(cornerRadius: 30.0).fill(self.getColor(color: card.color)).opacity(0.4))
-        default:
-            return AnyView(RoundedRectangle(cornerRadius: 30.0).stroke(self.getColor(color: card.color)))
-        }
-    }
-    
-    func drawRectangle(card: SetGame.Card) -> AnyView {
-        switch card.shading {
-        case .solid:
-            return AnyView(RoundedRectangle(cornerRadius: 2).fill(self.getColor(color: card.color)))
-        case .opaque:
-            return AnyView(RoundedRectangle(cornerRadius: 2).fill(self.getColor(color: card.color)).opacity(0.4))
-        default:
-            return AnyView(RoundedRectangle(cornerRadius: 2).stroke(self.getColor(color: card.color)))
-        }
-    }
-    
     let widthFactor: CGFloat = 0.7
     let heightFactor: CGFloat = 0.2
     let cornerRadius: CGFloat = 12.0
@@ -113,34 +79,13 @@ struct Card: View {
 }
 
 struct CardShapeView {
-    var card: SetGame.Card
+    var card: SetGame<SetShape>.Card
     
-}
-
-
-struct Diamond: Shape {
-    
-    func path(in rect: CGRect) -> Path {
-        let verticalScaleFactor: CGFloat = 0.9
-        let diamondHeight = rect.maxY * verticalScaleFactor
-        let topMiddle = CGPoint(x: rect.midX, y: rect.maxY - diamondHeight)
-        let middleLeft = CGPoint(x: 0, y: rect.midY)
-        let bottomMiddle = CGPoint(x: rect.midX, y: diamondHeight)
-        let middleRight = CGPoint(x: rect.maxX, y: rect.midY)
-        
-        var p = Path()
-        p.move(to: topMiddle)
-        p.addLine(to: middleLeft)
-        p.addLine(to: bottomMiddle)
-        p.addLine(to: middleRight)
-        p.addLine(to: topMiddle)
-        return p
-    }
 }
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        SetGameView(game: SetCardGame())
+        SetGameView(game: ShapeSetGame())
     }
 }
