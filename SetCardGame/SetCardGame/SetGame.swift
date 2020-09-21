@@ -21,55 +21,66 @@ enum CardStatus {
 
 struct SetGame<CardContent> where CardContent: Hashable {
     private (set) var cards: [Card] = []
+    private var emptyCardPositions: [Int] = Array(0...11)
+
+    let initialCardCount = 12
 
     func cardsBy(status: CardStatus) -> [Card]   {
-        return cards.filter{ card in card.status == status }
+        cards.filter{ card in card.status == status }
     }
     
     func cardsBy(statuses: [CardStatus]) -> [Card]   {
-        return cards.filter{ card in statuses.contains(card.status) }
+        cards.filter{ card in statuses.contains(card.status) }
     }
     
     var hasSetSelected: Bool {
-        return cardsBy(statuses: [.partOfInvalidSet, .partOfValidSet]).count == 3
+        cardsBy(statuses: [.partOfInvalidSet, .partOfValidSet]).count == 3
     }
     
     var hasValidSetSelected: Bool {
-        return cardsBy(status: .partOfValidSet).count == 3
-    }
+        cardsBy(status: .partOfValidSet).count == 3
+}
 
-    init(cardContents: [CardContent])  {
+    init(cardContents: [CardContent], contentCount: Int)  {
         var cardId = 0
-        for shape in cardContents {
-            for count in 1...shapeCount {
+        for content in cardContents {
+            for count in 1...contentCount {
                 for color in SetGameColor.allCases {
                     for shading in SetGameShading.allCases {
-                        let card = Card(id: cardId, shapeCount: count, shape: shape, color: color, shading: shading)
+                        let card = Card(id: cardId, contentCount: count, content: content, color: color, shading: shading)
                         cards.append(card)
                         cardId += 1
+                    }
                 }
             }
         }
-        }
         cards.shuffle()
-        dealCards(amount: 12)
+        dealCards(amount: initialCardCount)
     }
     
     
     private mutating func dealCards(amount: Int) {
-        let newCards = (cardsBy(status: .inPack).prefix(amount))
+        let newCards = cardsBy(status: .inPack).prefix(amount)
         for card in newCards {
             let cardIndex = cards.firstIndex(matching: card)!
             cards[cardIndex].status = .onScreen
+            if emptyCardPositions.isEmpty {
+                cards[cardIndex].position = cardsBy(status: .onScreen).count
+            } else {
+                cards[cardIndex].position = emptyCardPositions.removeFirst()
+            }
         }
     }
     
     
     
-    private mutating func setCardsStatus(oldStatus: CardStatus, newStatus: CardStatus) {
+    private mutating func switchCardsStatus(oldStatus: CardStatus, newStatus: CardStatus) {
         for card in cardsBy(status: oldStatus) {
             let cardIndex = cards.firstIndex(matching: card)!
             self.cards[cardIndex].status = newStatus
+            if newStatus == .removed {
+                emptyCardPositions.append(self.cards[cardIndex].position!)
+            }
         }
     }
     
@@ -80,9 +91,9 @@ struct SetGame<CardContent> where CardContent: Hashable {
         }
         
         let cardColors = cardsBy(status: .selected).map{ card in card.color }
-        let cardShapes = cardsBy(status: .selected).map{ card in card.shape }
+        let cardShapes = cardsBy(status: .selected).map{ card in card.content }
         let cardShadings = cardsBy(status: .selected).map{ card in card.shading }
-        let cardShapeCounts = cardsBy(status: .selected).map{ card in card.shapeCount }
+        let cardShapeCounts = cardsBy(status: .selected).map{ card in card.contentCount }
         
         return cardColors.isAllSameOrDistinct()
             && cardShapes.isAllSameOrDistinct()
@@ -94,13 +105,13 @@ struct SetGame<CardContent> where CardContent: Hashable {
         let chosenIndex = cards.firstIndex(matching: card)!
         if hasSetSelected {
             if hasValidSetSelected {
-                setCardsStatus(oldStatus: .partOfValidSet,newStatus: .removed)
+                switchCardsStatus(oldStatus: .partOfValidSet,newStatus: .removed)
                 dealCards(amount: 3)
                 if cards[chosenIndex].status == .onScreen {
                     cards[chosenIndex].status = .selected
                 }
             } else {
-                setCardsStatus(oldStatus: .partOfInvalidSet, newStatus: .onScreen)
+                switchCardsStatus(oldStatus: .partOfInvalidSet, newStatus: .onScreen)
                 cards[chosenIndex].status = .selected
             }
         } else {
@@ -108,17 +119,17 @@ struct SetGame<CardContent> where CardContent: Hashable {
                 cards[chosenIndex].status = .selected
             }
             if cardsBy(status: .selected).count == 3 {
-                setCardsStatus(oldStatus: .selected, newStatus: isSelectedSetValid() ? CardStatus.partOfValidSet : CardStatus.partOfInvalidSet)
+                switchCardsStatus(oldStatus: .selected, newStatus: isSelectedSetValid() ? CardStatus.partOfValidSet : CardStatus.partOfInvalidSet)
             }
         }
     }
     
     struct Card: Identifiable {
         var id: Int
+        var position: Int?
         var status: CardStatus = .inPack
-        var isShown: Bool = false
-        var shapeCount: Int
-        var shape: CardContent
+        var contentCount: Int
+        var content: CardContent
         var color: SetGameColor
         var shading: SetGameShading
     }

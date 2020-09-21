@@ -28,8 +28,6 @@ enum SetGameShading: CaseIterable {
 }
 
 
-let shapeCount = 3
-
 
 class ShapeSetGame: ObservableObject {
     
@@ -38,12 +36,12 @@ class ShapeSetGame: ObservableObject {
     
     static func createGame() -> SetGame<SetShape> {
         let cardShapes = SetGameShape.allCases.map{SetShape(shapeType: $0)}
-        return SetGame(cardContents: cardShapes)
+        return SetGame(cardContents: cardShapes, contentCount: 3)
     }
     
 
     var cards: [SetGame<SetShape>.Card] {
-        model.cardsBy(statuses: [.onScreen, .partOfInvalidSet, .partOfValidSet, .selected])
+        model.cardsBy(statuses: [.onScreen, .partOfInvalidSet, .partOfValidSet, .selected]).sorted{ $0.position! < $1.position! }
     }
     
     

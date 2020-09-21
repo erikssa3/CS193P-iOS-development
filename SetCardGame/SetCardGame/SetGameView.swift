@@ -35,13 +35,13 @@ struct Card: View {
             RoundedRectangle(cornerRadius: cornerRadius).fill(card.status == CardStatus.selected ? Color.gray : Color.white)
             RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor(card: card), lineWidth: edgeLineWidth)
             VStack {
-                ForEach(0..<card.shapeCount) { _ in
+                ForEach(0..<card.contentCount) { _ in
                     if self.card.shading == .solid || self.card.shading == .opaque {
-                        self.card.shape
+                        self.card.content
                             .fill(self.getColor(color: self.card.color))
                             .opacity(self.card.shading == .opaque ? 0.4 : 1)
                     } else {
-                        self.card.shape
+                        self.card.content
                             .stroke(self.getColor(color: self.card.color))
                     }
                 }
