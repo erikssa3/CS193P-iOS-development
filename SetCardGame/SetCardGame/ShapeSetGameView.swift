@@ -10,12 +10,24 @@ import SwiftUI
 
 struct SetGameView: View {
     @ObservedObject var game: ShapeSetGame
+    
     var body: some View {
-        return Grid(game.cards) { (card: SetGame<SetShape>.Card) in
-            Card(card: card).onTapGesture {
-                self.game.choose(card: card)
+        VStack {
+            Grid(game.cards) { (card: SetGame<SetShape>.Card) in
+                Card(card: card).onTapGesture {
+                    self.game.choose(card: card)
+                }
+            }.padding()
+            HStack {
+                Button("New Game"){
+                    self.game.restartGame()
+                }
+                Button("Deal three cards") {
+                    self.game.dealMoreCards()
+                }
+                .disabled(game.hasNoCardsInDeck())
             }
-        }.padding()
+        }
     }
 }
 

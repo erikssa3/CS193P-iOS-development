@@ -31,14 +31,12 @@ enum SetGameShading: CaseIterable {
 
 class ShapeSetGame: ObservableObject {
     
-    @Published private var model: SetGame<SetShape> = ShapeSetGame.createGame()
+    @Published private var model: SetGame<SetShape> = ShapeSetGame.initGame()
     
-    
-    static func createGame() -> SetGame<SetShape> {
-        let cardShapes = SetGameShape.allCases.map{SetShape(shapeType: $0)}
+    static func initGame() -> SetGame<SetShape> {
+        let cardShapes = SetGameShape.allCases.map{ SetShape(shapeType: $0) }
         return SetGame(cardContents: cardShapes, contentCount: 3)
     }
-    
 
     var cards: [SetGame<SetShape>.Card] {
         model.cardsBy(statuses: [.onScreen, .partOfInvalidSet, .partOfValidSet, .selected]).sorted{ $0.position! < $1.position! }
@@ -47,6 +45,22 @@ class ShapeSetGame: ObservableObject {
     
     func choose(card: SetGame<SetShape>.Card) {
         model.choose(card: card)
+    }
+    
+    func dealMoreCards() {
+        if model.hasValidSetSelected {
+            model.replaceCardsInValidSet()
+        } else {
+            model.dealCards(amount: 3)
+        }
+    }
+    
+    func restartGame() {
+        model = ShapeSetGame.initGame()
+    }
+    
+    func hasNoCardsInDeck() -> Bool {
+        model.cardsBy(status: .inPack).isEmpty
     }
 }
 

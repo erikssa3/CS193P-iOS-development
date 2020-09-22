@@ -18,18 +18,18 @@ enum CardStatus {
     case removed
 }
 
+let initialCardCount = 12
 
 struct SetGame<CardContent> where CardContent: Hashable {
     private (set) var cards: [Card] = []
-    private var emptyCardPositions: [Int] = Array(0...11)
+    private var emptyCardPositions: [Int] = Array(0...(initialCardCount - 1))
 
-    let initialCardCount = 12
 
-    func cardsBy(status: CardStatus) -> [Card]   {
+    func cardsBy(status: CardStatus) -> [Card] {
         cards.filter{ card in card.status == status }
     }
     
-    func cardsBy(statuses: [CardStatus]) -> [Card]   {
+    func cardsBy(statuses: [CardStatus]) -> [Card] {
         cards.filter{ card in statuses.contains(card.status) }
     }
     
@@ -39,7 +39,7 @@ struct SetGame<CardContent> where CardContent: Hashable {
     
     var hasValidSetSelected: Bool {
         cardsBy(status: .partOfValidSet).count == 3
-}
+    }
 
     init(cardContents: [CardContent], contentCount: Int)  {
         var cardId = 0
@@ -54,13 +54,18 @@ struct SetGame<CardContent> where CardContent: Hashable {
                 }
             }
         }
-        cards.shuffle()
+        //cards.shuffle()
         dealCards(amount: initialCardCount)
     }
     
     
-    private mutating func dealCards(amount: Int) {
+    mutating func dealCards(amount: Int) {
         let newCards = cardsBy(status: .inPack).prefix(amount)
+        
+        if hasValidSetSelected {
+            switchCardsStatus(oldStatus: .partOfValidSet, newStatus: .removed)
+        }
+        
         for card in newCards {
             let cardIndex = cards.firstIndex(matching: card)!
             cards[cardIndex].status = .onScreen
@@ -72,15 +77,24 @@ struct SetGame<CardContent> where CardContent: Hashable {
         }
     }
     
-    
+    mutating func replaceCardsInValidSet() {
+        for oldCard in cardsBy(status: .partOfValidSet) {
+            let oldCardIndex = cards.firstIndex(matching: oldCard)!
+            let oldCardPosition = cards[oldCardIndex].position!
+            self.cards[oldCardIndex].status = .removed
+            if oldCardPosition < 12 {
+                emptyCardPositions.append(cards[oldCardIndex].position!)
+            }
+            if cardsBy(statuses: [.onScreen, .partOfValidSet]).count < initialCardCount {
+                dealCards(amount: 1)
+            }
+        }
+    }
     
     private mutating func switchCardsStatus(oldStatus: CardStatus, newStatus: CardStatus) {
         for card in cardsBy(status: oldStatus) {
             let cardIndex = cards.firstIndex(matching: card)!
             self.cards[cardIndex].status = newStatus
-            if newStatus == .removed {
-                emptyCardPositions.append(self.cards[cardIndex].position!)
-            }
         }
     }
     
@@ -105,8 +119,7 @@ struct SetGame<CardContent> where CardContent: Hashable {
         let chosenIndex = cards.firstIndex(matching: card)!
         if hasSetSelected {
             if hasValidSetSelected {
-                switchCardsStatus(oldStatus: .partOfValidSet,newStatus: .removed)
-                dealCards(amount: 3)
+                replaceCardsInValidSet()
                 if cards[chosenIndex].status == .onScreen {
                     cards[chosenIndex].status = .selected
                 }
