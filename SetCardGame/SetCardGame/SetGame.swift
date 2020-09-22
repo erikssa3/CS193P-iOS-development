@@ -54,7 +54,7 @@ struct SetGame<CardContent> where CardContent: Hashable {
                 }
             }
         }
-        //cards.shuffle()
+        cards.shuffle()
         dealCards(amount: initialCardCount)
     }
     
@@ -82,7 +82,7 @@ struct SetGame<CardContent> where CardContent: Hashable {
             let oldCardIndex = cards.firstIndex(matching: oldCard)!
             let oldCardPosition = cards[oldCardIndex].position!
             self.cards[oldCardIndex].status = .removed
-            if oldCardPosition < 12 {
+            if oldCardPosition < initialCardCount {
                 emptyCardPositions.append(cards[oldCardIndex].position!)
             }
             if cardsBy(statuses: [.onScreen, .partOfValidSet]).count < initialCardCount {

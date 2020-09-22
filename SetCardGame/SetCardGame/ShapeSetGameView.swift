@@ -15,17 +15,30 @@ struct SetGameView: View {
         VStack {
             Grid(game.cards) { (card: SetGame<SetShape>.Card) in
                 Card(card: card).onTapGesture {
-                    self.game.choose(card: card)
+                    if game.hasValidSetSelected {
+                        withAnimation(.easeOut(duration: 0.8)) {
+                            game.choose(card: card)
+                        }
+                    } else {
+                        game.choose(card: card)
+                    }
                 }
-            }.padding()
+            }
+            .padding()
             HStack {
                 Button("New Game"){
-                    self.game.restartGame()
+                    withAnimation(.easeOut(duration: 1)) {
+                        game.restartGame()
+                    }
                 }
+                .padding(.horizontal)
                 Button("Deal three cards") {
-                    self.game.dealMoreCards()
+                    withAnimation(.easeOut(duration: 0.8)) {
+                        game.dealMoreCards()
+                    }
                 }
-                .disabled(game.hasNoCardsInDeck())
+                .disabled(game.hasNoCardsInDeck)
+                .padding(.horizontal)
             }
         }
     }
@@ -36,36 +49,57 @@ struct SetGameView: View {
 struct Card: View {
     var card: SetGame<SetShape>.Card
     
+    var isFilled: Bool {
+        card.shading == .solid || card.shading == .opaque
+    }
+    
+    var cardBackgroundColor: Color {
+        card.status == CardStatus.selected ? Color.gray : Color.white
+    }
+    
+    var cardOpacity: Double {
+        card.shading == .opaque ? 0.4 : 1
+    }
+    
     var body: some View {
         GeometryReader { geometry in
-            self.body(for: geometry.size)
-        }
+            body(for: geometry.size)
+        }.transition(AnyTransition.offset(animationStartLocation()))
     }
     
     private func body(for size: CGSize) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius).fill(card.status == CardStatus.selected ? Color.gray : Color.white)
-            RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor(card: card), lineWidth: edgeLineWidth)
+            RoundedRectangle(cornerRadius: cornerRadius).fill(cardBackgroundColor)
+            RoundedRectangle(cornerRadius: cornerRadius).stroke(resolveBorderColor(card: card), lineWidth: edgeLineWidth)
             VStack {
                 ForEach(0..<card.contentCount) { _ in
-                    if self.card.shading == .solid || self.card.shading == .opaque {
-                        self.card.content
-                            .fill(self.getColor(color: self.card.color))
-                            .opacity(self.card.shading == .opaque ? 0.4 : 1)
+                    if isFilled {
+                        card.content
+                            .fill(resolveColor(color: card.color))
+                            .opacity(cardOpacity)
                     } else {
-                        self.card.content
-                            .stroke(self.getColor(color: self.card.color))
+                        card.content
+                            .stroke(resolveColor(color: card.color))
                     }
                 }
-                .frame(width: size.width * self.widthFactor, height: size.height * self.heightFactor)
+                .frame(width: size.width * widthFactor, height: size.height * heightFactor)
             }
             .padding(.vertical)
         }
         .padding(5)
         .aspectRatio(2/3, contentMode: .fit)
+
     }
     
-    func borderColor(card: SetGame<SetShape>.Card) -> Color {
+    func animationStartLocation() -> CGSize {
+        let angle = Double.random(in: 0..<2*Double.pi)
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        return CGSize(width: Double(screenWidth + 100) * cos(angle),
+                      height: Double(screenHeight + 100) * sin(angle))
+        }
+    
+    func resolveBorderColor(card: SetGame<SetShape>.Card) -> Color {
         switch card.status {
         case .partOfValidSet:
             return Color.green
@@ -76,7 +110,7 @@ struct Card: View {
         }
     }
     
-    func getColor(color: SetGameColor) -> Color {
+    func resolveColor(color: SetGameColor) -> Color {
         switch color {
         case .blue: return Color.blue
         case .green: return Color.green
@@ -88,11 +122,6 @@ struct Card: View {
     let heightFactor: CGFloat = 0.2
     let cornerRadius: CGFloat = 12.0
     let edgeLineWidth: CGFloat = 3
-}
-
-struct CardShapeView {
-    var card: SetGame<SetShape>.Card
-    
 }
 
 

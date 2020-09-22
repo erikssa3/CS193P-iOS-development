@@ -42,6 +42,13 @@ class ShapeSetGame: ObservableObject {
         model.cardsBy(statuses: [.onScreen, .partOfInvalidSet, .partOfValidSet, .selected]).sorted{ $0.position! < $1.position! }
     }
     
+    var hasNoCardsInDeck: Bool {
+        model.cardsBy(status: .inPack).isEmpty
+    }
+    
+    var hasValidSetSelected: Bool {
+        model.hasValidSetSelected
+    }
     
     func choose(card: SetGame<SetShape>.Card) {
         model.choose(card: card)
@@ -59,9 +66,7 @@ class ShapeSetGame: ObservableObject {
         model = ShapeSetGame.initGame()
     }
     
-    func hasNoCardsInDeck() -> Bool {
-        model.cardsBy(status: .inPack).isEmpty
-    }
+    
 }
 
 
