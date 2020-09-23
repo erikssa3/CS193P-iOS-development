@@ -13,10 +13,10 @@ struct SetGameView: View {
     
     var body: some View {
         VStack {
-            Grid(game.cards) { (card: SetGame<SetShape>.Card) in
+            Grid(game.activeCards) { (card: ShapeSetGameCard) in
                 Card(card: card).onTapGesture {
                     if game.hasValidSetSelected {
-                        withAnimation(.easeOut(duration: 0.8)) {
+                        gameActionWithAnimation(duration: 0.5) {
                             game.choose(card: card)
                         }
                     } else {
@@ -27,13 +27,13 @@ struct SetGameView: View {
             .padding()
             HStack {
                 Button("New Game"){
-                    withAnimation(.easeOut(duration: 1)) {
+                    gameActionWithAnimation(duration: 1) {
                         game.restartGame()
                     }
                 }
                 .padding(.horizontal)
                 Button("Deal three cards") {
-                    withAnimation(.easeOut(duration: 0.8)) {
+                    gameActionWithAnimation(duration: 0.5) {
                         game.dealMoreCards()
                     }
                 }
@@ -42,12 +42,16 @@ struct SetGameView: View {
             }
         }
     }
+    
+    func gameActionWithAnimation(duration: Double, action: () -> Void) {
+        withAnimation(.easeOut(duration: duration), action)
+    }
 }
 
 
 
 struct Card: View {
-    var card: SetGame<SetShape>.Card
+    var card: ShapeSetGameCard
     
     var isFilled: Bool {
         card.shading == .solid || card.shading == .opaque
@@ -64,7 +68,10 @@ struct Card: View {
     var body: some View {
         GeometryReader { geometry in
             body(for: geometry.size)
-        }.transition(AnyTransition.offset(animationStartLocation()))
+        }
+        .padding(5)
+        .aspectRatio(2/3, contentMode: .fit)
+        .transition(AnyTransition.offset(animationStartLocation()))
     }
     
     private func body(for size: CGSize) -> some View {
@@ -86,8 +93,7 @@ struct Card: View {
             }
             .padding(.vertical)
         }
-        .padding(5)
-        .aspectRatio(2/3, contentMode: .fit)
+        
 
     }
     
