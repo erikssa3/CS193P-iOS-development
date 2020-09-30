@@ -13,6 +13,8 @@ class EmojiArtDocument: ObservableObject {
 
     static let palette: String = "⭐️🌨🍏🥐🦑🤬"
     
+    @Published var selectedEmojis = Set<EmojiArt.Emoji>()
+    
     private var emojiArt: EmojiArt = EmojiArt() {
         willSet {
             objectWillChange.send()
@@ -50,6 +52,15 @@ class EmojiArtDocument: ObservableObject {
             let newSize = Int((CGFloat(emojiArt.emojies[index].size) * scale).rounded(.toNearestOrEven))
             emojiArt.emojies[index].size += newSize
         }
+    }
+    
+    func selectEmoji(_ emoji: EmojiArt.Emoji) {
+        if selectedEmojis.contains(emoji) {
+            selectedEmojis.remove(emoji)
+        } else {
+            selectedEmojis.insert(emoji)
+        }
+        print(selectedEmojis)
     }
     
     func setBackgroundURL(_ url: URL?) {

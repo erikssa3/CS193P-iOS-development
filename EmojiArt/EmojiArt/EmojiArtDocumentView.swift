@@ -29,11 +29,18 @@ struct EmojiArtDocumentView: View {
                             .scaleEffect(zoomScale)
                             .offset(panOffset)
                     )
-                        .gesture(doubleTapToZoom(in: geometry.size))
+                    .gesture(doubleTapToZoom(in: geometry.size))
                     ForEach(document.emojies) { emoji in
                         Text(emoji.text)
                             .font(animatableWithSize: emoji.fontSize * zoomScale)
+                            .background(
+                                RoundedRectangle(cornerRadius: 2)
+                                    .stroke(Color.red)
+                                    .opacity(document.selectedEmojis.contains(emoji) ? 1 : 0)
+                            )
                             .position(location(for: emoji, in: geometry.size))
+                            .gesture(singleTapForSelecting(target: emoji))
+                           
                     }
                 }
                 .clipped()
@@ -49,6 +56,13 @@ struct EmojiArtDocumentView: View {
                 }
             }
         }
+    }
+    
+    private func singleTapForSelecting(target: EmojiArt.Emoji) -> some Gesture {
+        TapGesture(count: 1)
+            .onEnded {
+                document.selectEmoji(target)
+            }
     }
     
     @State private var steadyStateZoomScale: CGFloat = 1.0
@@ -86,12 +100,17 @@ struct EmojiArtDocumentView: View {
     }
     
     private func doubleTapToZoom(in size: CGSize) -> some Gesture {
-        TapGesture(count: 2)
+        let deselectAll = TapGesture(count: 1)
+            .onEnded {
+                document.selectedEmojis.removeAll()
+            }
+        return TapGesture(count: 2)
             .onEnded {
                 withAnimation {
                     zoomToFit(document.backgroundImage, in: size)
                 }
             }
+            .exclusively(before: deselectAll)
     }
     
     private func zoomToFit(_ image: UIImage?, in size: CGSize) {
@@ -126,8 +145,6 @@ struct EmojiArtDocumentView: View {
     
     private let defaultEmojiSize: CGFloat = 40
 }
-
-
 
 struct OptionalImage: View {
     var uiImage: UIImage?
