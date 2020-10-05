@@ -38,7 +38,7 @@ struct EmojiArtDocumentView: View {
                     .gesture(doubleTapToZoom(in: geometry.size))
                     ForEach(document.emojies) { emoji in
                         Text(emoji.text)
-                            .font(animatableWithSize: emoji.fontSize * zoomScale)
+                            .font(animatableWithSize: emoji.fontSize *  zoomScale * (document.selectedEmojis.contains(emoji) ? gestureZoomScale : 1))
                             .background(
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 2)
@@ -83,7 +83,7 @@ struct EmojiArtDocumentView: View {
     @GestureState private var gestureZoomScale: CGFloat = 1.0
     
     private var zoomScale: CGFloat {
-        steadyStateZoomScale * gestureZoomScale
+        document.selectedEmojis.isEmpty ? steadyStateZoomScale * gestureZoomScale : steadyStateZoomScale
     }
     
     private func zoomGesture() -> some Gesture {
@@ -92,7 +92,14 @@ struct EmojiArtDocumentView: View {
                 gestureZoomScale = latestGestureScale
             }
             .onEnded { finalGestureScale in
-                steadyStateZoomScale *= finalGestureScale
+                if document.selectedEmojis.isEmpty {
+                    steadyStateZoomScale *= finalGestureScale
+                } else {
+                    for selectedEmoji in document.selectedEmojis {
+                        document.scaleEmoji(selectedEmoji, by: finalGestureScale)
+                    }
+                }
+                
             }
     }
     
