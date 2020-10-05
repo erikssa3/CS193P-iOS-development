@@ -8,22 +8,37 @@
 
 import SwiftUI
 
+let orange = UIColor.RGB(red: 255/255, green: 69/255, blue: 0/255, alpha: 1)
+let green = UIColor.RGB(red: 50/255, green: 205/255, blue: 50/255, alpha: 1)
+let red = UIColor.RGB(red: 139/255, green: 0/255, blue: 0/255, alpha: 1)
+let gray = UIColor.RGB(red: 220/255, green: 220/255, blue: 220/255, alpha: 1)
+let yellow = UIColor.RGB(red: 255/255, green: 255/255, blue: 0/255, alpha: 1)
+let magneta = UIColor.RGB(red: 139/255, green: 0/255, blue: 139/255, alpha: 1)
+
+struct Theme: Codable {
+    var name: String
+    var emojies: Array<String>
+    var color: UIColor.RGB
+    var pairAmount: Int?
+}
 
 class EmojiMemoryGame: ObservableObject {
     @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
 
     private static var themes = [
-        MemoryGame<String>.Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: Color.orange),
-        MemoryGame<String>.Theme(name: "Animals", emojies: ["🐥", "🐬", "🦑", "🐢"], color: Color.green, pairAmount: 2),
-        MemoryGame<String>.Theme(name: "Food", emojies: ["🍣", "🌭", "🥐", "🥓"], color: Color.red, pairAmount: 3),
-        MemoryGame<String>.Theme(name: "Times", emojies: ["🕐", "🕑", "🕖", "🕗", "🕡", "🕧"], color: Color.gray, pairAmount: 6),
-        MemoryGame<String>.Theme(name: "Weather", emojies: ["☀️", "🌥", "⛈", "🌨"], color: Color.yellow, pairAmount: 4),
-        MemoryGame<String>.Theme(name: "Faces", emojies: ["🥳", "😂", "😫", "😎", "😝", "🥶"], color: Color.yellow),
+        Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange),
+        Theme(name: "Animals", emojies: ["🐥", "🐬", "🦑", "🐢"], color: green, pairAmount: 2),
+        Theme(name: "Food", emojies: ["🍣", "🌭", "🥐", "🥓"], color: red, pairAmount: 3),
+        Theme(name: "Times", emojies: ["🕐", "🕑", "🕖", "🕗", "🕡", "🕧"], color: gray, pairAmount: 6),
+        Theme(name: "Weather", emojies: ["☀️", "🌥", "⛈", "🌨"], color: yellow, pairAmount: 4),
+        Theme(name: "Faces", emojies: ["🥳", "😂", "😫", "😎", "😝", "🥶"], color: magneta),
         ]
     
     private static func createMemoryGame() -> MemoryGame<String> {
         let theme = themes.randomElement()!
-        let pairAmount = theme.pairAmount ?? Int.random(in: 2...theme.emojies.count)
+        let pairAmount = theme.pairAmount ?? theme.emojies.count
+        let jsonData = try? JSONEncoder().encode(theme)
+        print(String(data: jsonData!, encoding: .utf8) ?? "no json found")
         return MemoryGame<String>(numberOfPairsOfCards: pairAmount, color: theme.color, name: theme.name) { pairIndex in
             return theme.emojies[pairIndex]
         }
@@ -33,7 +48,7 @@ class EmojiMemoryGame: ObservableObject {
         model.cards
     }
     
-    var themeColor: Color {
+    var themeColor: UIColor.RGB {
         model.themeColor
     }
     
