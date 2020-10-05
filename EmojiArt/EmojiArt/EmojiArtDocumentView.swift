@@ -19,6 +19,12 @@ struct EmojiArtDocumentView: View {
                             .font(Font.system(size: defaultEmojiSize))
                             .onDrag { NSItemProvider(object: emoji as NSString ) }
                     }
+                    Button("Remove selected emojie") {
+                        for selectedEmoji in document.selectedEmojis {
+                            deleteEmoji(selectedEmoji)
+                        }
+                    }
+                    .disabled(document.selectedEmojis.isEmpty)
                 }
             }
             .padding(.horizontal)
@@ -34,16 +40,20 @@ struct EmojiArtDocumentView: View {
                         Text(emoji.text)
                             .font(animatableWithSize: emoji.fontSize * zoomScale)
                             .background(
-                                RoundedRectangle(cornerRadius: 2)
-                                    .stroke(Color.red)
-                                    .opacity(document.selectedEmojis.contains(emoji) ? 1 : 0)
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 2)
+                                        .stroke(Color.red)
+                                        .opacity(document.selectedEmojis.contains(emoji) ? 1 : 0)
+                                }
+                                
                             )
                             .position(location(for: emoji, in: geometry.size))
                             .gesture(singleTapForSelecting(target: emoji))
-                           
+                            .gesture(panEmojies(target: emoji))
                     }
                 }
                 .clipped()
+                .contentShape(Rectangle().size(geometry.size))
                 .gesture(panGesture())
                 .gesture(zoomGesture())
                 .edgesIgnoringSafeArea([.horizontal, .bottom])
@@ -56,6 +66,10 @@ struct EmojiArtDocumentView: View {
                 }
             }
         }
+    }
+    
+    private func deleteEmoji(_ emoji: EmojiArt.Emoji) {
+        document.deleteEmoji(emoji)
     }
     
     private func singleTapForSelecting(target: EmojiArt.Emoji) -> some Gesture {
@@ -99,6 +113,27 @@ struct EmojiArtDocumentView: View {
             }
     }
     
+    
+    @GestureState private var selectedEmojisPanOffset: CGSize = .zero
+    
+    private func panEmojies(target emoji: EmojiArt.Emoji) -> some Gesture {
+        let selectedEmojies = document.selectedEmojis
+        return DragGesture()
+            .updating($selectedEmojisPanOffset) { latestDragGestureValue, selectedEmojisPanOffset, transaction in
+                if selectedEmojies.contains(emoji) {
+                    selectedEmojisPanOffset = latestDragGestureValue.translation / zoomScale
+                }
+            }
+            .onEnded { finalDragGestureValue in
+                if selectedEmojies.contains(emoji) {
+                    for selectedEmoji in selectedEmojies {
+                        document.moveEmoji(selectedEmoji, by: (finalDragGestureValue.translation / zoomScale))
+                    }
+                }
+            }
+    }
+    
+    
     private func doubleTapToZoom(in size: CGSize) -> some Gesture {
         let deselectAll = TapGesture(count: 1)
             .onEnded {
@@ -125,6 +160,9 @@ struct EmojiArtDocumentView: View {
     
     private func location(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
         var location = emoji.location
+        if document.selectedEmojis.contains(emoji) {
+            location = CGPoint(x: location.x + selectedEmojisPanOffset.width, y: location.y + selectedEmojisPanOffset.height)
+        }
         location = CGPoint(x: location.x * zoomScale, y: location.y * zoomScale)
         location = CGPoint(x: location.x + size.width/2, y: location.y + size.height/2)
         location = CGPoint(x: location.x + panOffset.width, y: location.y + panOffset.height)

@@ -39,6 +39,11 @@ class EmojiArtDocument: ObservableObject {
         emojiArt.addEmoji(emoji, x: Int(location.x), y: Int(location.y), size: Int(size))
     }
     
+    func deleteEmoji(_ emoji: EmojiArt.Emoji) {
+        emojiArt.emojies.remove(at: emojiArt.emojies.firstIndex(of: emoji)!)
+    }
+    
+    
     func moveEmoji(_ emoji: EmojiArt.Emoji, by offset: CGSize) {
         if let index = emojiArt.emojies.firstIndex(matching: emoji) {
             emojiArt.emojies[index].x += Int(offset.width)
