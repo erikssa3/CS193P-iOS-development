@@ -15,7 +15,8 @@ let gray = UIColor.RGB(red: 220/255, green: 220/255, blue: 220/255, alpha: 1)
 let yellow = UIColor.RGB(red: 255/255, green: 255/255, blue: 0/255, alpha: 1)
 let magneta = UIColor.RGB(red: 139/255, green: 0/255, blue: 139/255, alpha: 1)
 
-struct Theme: Codable {
+struct Theme: Codable, Identifiable {
+    var id: UUID = UUID()
     var name: String
     var emojies: Array<String>
     var color: UIColor.RGB
@@ -23,7 +24,8 @@ struct Theme: Codable {
 }
 
 class EmojiMemoryGame: ObservableObject {
-    @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
+    private var theme: Theme
+    @Published private var model: MemoryGame<String>
 
     private static var themes = [
         Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange),
@@ -34,8 +36,12 @@ class EmojiMemoryGame: ObservableObject {
         Theme(name: "Faces", emojies: ["🥳", "😂", "😫", "😎", "😝", "🥶"], color: magneta),
         ]
     
-    private static func createMemoryGame() -> MemoryGame<String> {
-        let theme = themes.randomElement()!
+    init(theme: Theme) {
+        self.theme = theme
+        model = EmojiMemoryGame.createMemoryGame(theme: theme)
+    }
+    
+    private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
         let pairAmount = theme.pairAmount ?? theme.emojies.count
         let jsonData = try? JSONEncoder().encode(theme)
         print(String(data: jsonData!, encoding: .utf8) ?? "no json found")
@@ -65,7 +71,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func startGame() {
-        model = EmojiMemoryGame.createMemoryGame()
+        model = EmojiMemoryGame.createMemoryGame(theme: theme)
     }
     
 
