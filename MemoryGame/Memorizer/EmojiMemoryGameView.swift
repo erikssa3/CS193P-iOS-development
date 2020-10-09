@@ -13,11 +13,6 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack {
-            HStack(alignment: .lastTextBaseline) {
-                Text(viewModel.themeName)
-                    .font(Font.title)
-                Text("Score: \(viewModel.score)")
-            }
             Grid(viewModel.cards) { card in
                 CardView(card: card).onTapGesture {
                     withAnimation(.linear) {
@@ -26,12 +21,14 @@ struct EmojiMemoryGameView: View {
                 }
                 .padding(5)
             }
-            .padding()
             .foregroundColor(Color(viewModel.themeColor))
-            Button("New game") {
-                withAnimation(.easeInOut) {
-                    self.viewModel.startGame()
+            HStack {
+                Button("New game") {
+                    withAnimation(.easeInOut) {
+                        self.viewModel.startGame()
+                    }
                 }
+                Text("Score: \(viewModel.score)")
             }
         }
     }

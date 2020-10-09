@@ -11,5 +11,9 @@ import Foundation
 
 class EmojiMemoryThemeStore: ObservableObject {
     
-    @Published var themes: [Theme] = [Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange)]
+    @Published var themes: [Theme] = [
+        Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange),
+        Theme(name: "Times", emojies: ["🕐", "🕑", "🕖", "🕗", "🕡", "🕧"], color: gray, pairAmount: 6),
+        Theme(name: "Weather", emojies: ["☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨"], color: yellow, pairAmount: 4),
+    ]
 }
