@@ -11,32 +11,33 @@ import SwiftUI
 struct EmojiMemoryThemeChooser: View {
     @ObservedObject var store: EmojiMemoryThemeStore
     @State private var editMode: EditMode = .inactive
-    @State private var showThemeEditor: Bool = false
-
+    @State private var showThemeCreator: Bool = false
+    
     var body: some View {
         NavigationView {
             List {
                 ForEach(store.themes) { theme in
                     NavigationLink(destination: EmojiMemoryGameView(viewModel: EmojiMemoryGame(theme: theme)).navigationBarTitle(theme.name)) {
-                        ThemeRow(theme: theme, isEditing: editMode.isEditing, store: store, showThemeEditor: $showThemeEditor)
+                        ThemeRow(theme: theme, isEditing: editMode.isEditing, store: store)
                     }
                 }.onDelete { indexSet in
-                    print(indexSet)
+                    indexSet.forEach( { store.removeTheme(index: $0) })
                 }
             }
             .navigationBarTitle("Memorize")
-            .navigationBarItems(leading: Button(action: {
-                let newTheme = Theme(name: "", emojies: ["🥰", "😘"], color: blue, pairAmount: 2)
-                store.addTheme(theme: newTheme)
-                showThemeEditor = true
-            }, label: {
-                Image(systemName: "plus").imageScale(.large)
-                    .popover(isPresented: $showThemeEditor) {
-                        ThemeEditor(theme: store.themes.last!, isShowing: $showThemeEditor)
-                            .environmentObject(store)
-                    }
-            }),
-            trailing: EditButton())
+            .navigationBarItems(
+                leading: Button(action: {
+                    let newTheme = Theme(name: "", emojies: ["🥰", "😘"], color: blue, pairAmount: 2)
+                    store.add(theme: newTheme)
+                    showThemeCreator = true
+                }, label: {
+                    Image(systemName: "plus").imageScale(.large)
+                        .popover(isPresented: $showThemeCreator) {
+                            ThemeEditor(theme: store.themes.last!, isShowing: $showThemeCreator)
+                                .environmentObject(store)
+                        }
+                }),
+                trailing: EditButton())
             .environment(\.editMode, $editMode)
         }
     }
@@ -46,16 +47,15 @@ struct ThemeRow: View {
     var theme: Theme
     var emojis: String
     var isEditing: Bool
-    @Binding var showThemeEditor: Bool
+    @State private var showThemeEditor: Bool = false
     @ObservedObject var store: EmojiMemoryThemeStore
     
-    init(theme: Theme, isEditing: Bool, store: EmojiMemoryThemeStore, showThemeEditor: Binding<Bool>) {
+    init(theme: Theme, isEditing: Bool, store: EmojiMemoryThemeStore) {
         let emojisPrefix = theme.pairAmount == theme.emojies.count ? "All of " : "\(theme.pairAmount) pairs from "
         self.theme = theme
         self.emojis = emojisPrefix + theme.emojies.joined(separator: "")
         self.isEditing = isEditing
         self.store = store
-        self._showThemeEditor = showThemeEditor
     }
     
     var body: some View {

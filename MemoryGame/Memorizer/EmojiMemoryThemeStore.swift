@@ -14,7 +14,7 @@ class EmojiMemoryThemeStore: ObservableObject {
     static let defaultThemes: [Theme] = [
         Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange, pairAmount: 2),
         Theme(name: "Times", emojies: ["🕐", "🕑", "🕖", "🕗", "🕡", "🕧"], color: gray, pairAmount: 6),
-        Theme(name: "Spooky Weather", emojies: ["☀️", "🌥", "⛈", "🌨", "👻", "🎃", "🕷"], color: yellow, pairAmount: 4),
+        Theme(name: "Spooky Weather", emojies: ["☀️", "🌥", "⛈", "🌨", "👻", "🎃", "🕷", "🥳", "😂", "😫", "😎", "😝", "🥶"], color: yellow, pairAmount: 4),
     ]
     
     @Published var themes: [Theme] = EmojiMemoryThemeStore.defaultThemes
@@ -30,7 +30,7 @@ class EmojiMemoryThemeStore: ObservableObject {
         themes[index].emojies = themes[index].emojies.filter({ $0 != emoji })
     }
     
-    func renameTheme(theme: Theme, newName: String) {
+    func rename(theme: Theme, newName: String) {
         let index = themes.firstIndex(matching: theme)!
         themes[index].name = newName
     }
@@ -40,7 +40,11 @@ class EmojiMemoryThemeStore: ObservableObject {
         themes[index].pairAmount = pairCount
     }
     
-    func addTheme(theme: Theme) {
+    func add(theme: Theme) {
         themes.append(theme)
+    }
+    
+    func removeTheme(index: Int) {
+        themes.remove(at: index)
     }
 }

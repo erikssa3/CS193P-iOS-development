@@ -31,7 +31,7 @@ struct ThemeEditor: View {
             Form {
                 TextField("Theme Name", text: $themeName, onEditingChanged: { began in
                     if !began {
-                        store.renameTheme(theme: theme, newName: themeName)
+                        store.rename(theme: theme, newName: themeName)
                     }
                 })
                 Section(header: Text("Add Emoji")) {
