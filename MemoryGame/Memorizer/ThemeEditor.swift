@@ -45,18 +45,8 @@ struct ThemeEditor: View {
                     }
                 }
                 Section(header: EmojiSectionHeader()) {
-                    HStack {
-                        ForEach(chosenPalette, id: \.self) { emoji in
-                            Text(emoji)
-                                .font(.title)
-                                .onTapGesture {
-                                    if (chosenPalette.count > 2) {
-                                        store.removeEmoji(theme: theme, emoji: emoji)
-                                        chosenPalette = chosenPalette.filter({ $0 != emoji })
-                                    }
-                                }
-                        }
-                    }
+                    ChosenEmojies(chosenPalette: $chosenPalette, theme: theme)
+                        .environmentObject(store)
                 }
                 Section(header: Text("Card Count")) {
                     HStack {
@@ -73,6 +63,42 @@ struct ThemeEditor: View {
             chosenPalette = theme.emojies
             pairCount = theme.pairAmount
         })
+    }
+}
+
+struct ChosenEmojies: View {
+    @Binding var chosenPalette: [String]
+    @EnvironmentObject var store: EmojiMemoryThemeStore
+    var theme: Theme
+    
+    var body: some View {
+        if #available(iOS 14.0, *) {
+            LazyVGrid(columns: [GridItem(),GridItem(),GridItem()]) {
+                ForEach(chosenPalette, id: \.self) { emoji in
+                    Text(emoji)
+                        .font(.title)
+                        .onTapGesture {
+                            if (chosenPalette.count > 2) {
+                                store.removeEmoji(theme: theme, emoji: emoji)
+                                chosenPalette = chosenPalette.filter({ $0 != emoji })
+                            }
+                        }
+                }
+            }
+        } else {
+            HStack{
+                ForEach(chosenPalette, id: \.self) { emoji in
+                    Text(emoji)
+                        .font(.title)
+                        .onTapGesture {
+                            if (chosenPalette.count > 2) {
+                                store.removeEmoji(theme: theme, emoji: emoji)
+                                chosenPalette = chosenPalette.filter({ $0 != emoji })
+                            }
+                        }
+                }
+            }
+        }
     }
 }
 
