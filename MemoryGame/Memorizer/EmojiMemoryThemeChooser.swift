@@ -36,15 +36,9 @@ struct ThemeEditor: View {
     @EnvironmentObject var store: EmojiMemoryThemeStore
     @Binding var isShowing: Bool
     @State var emojiesToAdd = ""
-    @State var chosenPalette = ""
+    @State var chosenPalette: [String] = []
     @State var themeName = ""
-    
-    var pairCount: Int {
-        get {
-            let index = store.themes.firstIndex(matching: theme)!
-            return store.themes[index].pairAmount
-        }
-    }
+    @State var pairCount = 0
     
     var body: some View {
         VStack {
@@ -68,31 +62,51 @@ struct ThemeEditor: View {
                         TextField("Emoji", text: $emojiesToAdd)
                         Button("Add") {
                             onAddEmojis(newEmojis: emojiesToAdd)
+                            chosenPalette += emojiesToAdd.map( {String($0)} )
                             emojiesToAdd = ""
                         }
                     }
                 }
                 Section(header: EmojiSectionHeader()) {
-                    TextField("emojis will be here lol", text: $chosenPalette)
+                    HStack {
+                        ForEach(chosenPalette, id: \.self) { emoji in
+                            Text(emoji)
+                                .font(.title)
+                                .onTapGesture {
+                                    if (chosenPalette.count > 2) {
+                                        onRemoveEmoji(emoji: emoji)
+                                        chosenPalette = chosenPalette.filter({ $0 != emoji })
+                                    }
+                                }
+                        }
+                    }
                 }
                 Section(header: Text("Card Count")) {
                     HStack {
-                        Text("\(pairCount) Pairs")
-                        Stepper(
-                            onIncrement: { onStepperAction(increment: true) },
-                            onDecrement: { onStepperAction(increment: false) },
-                            label: { EmptyView() })
+                        Stepper(value: $pairCount, in: 2...max(chosenPalette.count,2), step: 1, onEditingChanged: { began in
+                            if !began {
+                                onStepperAction()
+                            }
+                        }) { Text("\(pairCount) Pairs") }
                     }
                 }
             }
         }.onAppear(perform: {
             themeName = theme.name
+            chosenPalette = theme.emojies
+            pairCount = theme.pairAmount
         })
     }
     
     func onAddEmojis(newEmojis: String) {
         let index = store.themes.firstIndex(matching: theme)!
-        store.themes[index].emojies = store.themes[index].emojies + newEmojis.map( {String($0)} )
+        let newEmojisArray: [String] = newEmojis.map( {String($0)} )
+        store.themes[index].emojies = store.themes[index].emojies + newEmojisArray
+    }
+    
+    func onRemoveEmoji(emoji: String) {
+        let index = store.themes.firstIndex(matching: theme)!
+        store.themes[index].emojies = store.themes[index].emojies.filter({ $0 != emoji })
     }
     
     func onRename(newName: String) {
@@ -100,9 +114,9 @@ struct ThemeEditor: View {
         store.themes[index].name = newName
     }
     
-    func onStepperAction(increment: Bool) {
+    func onStepperAction() {
         let index = store.themes.firstIndex(matching: theme)!
-        store.themes[index].pairAmount = store.themes[index].pairAmount + (increment ? 1 : -1)
+        store.themes[index].pairAmount = pairCount
     }
 }
 
