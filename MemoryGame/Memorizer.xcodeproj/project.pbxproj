@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4425C943253441E900B4F19E /* ThemeEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4425C942253441E900B4F19E /* ThemeEditor.swift */; };
 		44568A5B25078A4300198005 /* Pie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44568A5A25078A4300198005 /* Pie.swift */; };
 		44568A5D2507903300198005 /* Cardify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44568A5C2507903300198005 /* Cardify.swift */; };
 		447BEE5D252B614C006C915F /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 447BEE5C252B614C006C915F /* UIColorExtension.swift */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4425C942253441E900B4F19E /* ThemeEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeEditor.swift; sourceTree = "<group>"; };
 		44568A5A25078A4300198005 /* Pie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pie.swift; sourceTree = "<group>"; };
 		44568A5C2507903300198005 /* Cardify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cardify.swift; sourceTree = "<group>"; };
 		447BEE5C252B614C006C915F /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				44DC64962504DE6A001D841B /* EmojiMemoryGame.swift */,
 				44D27A3D252F7417009F3B2B /* EmojiMemoryThemeStore.swift */,
 				44D27A41252F790B009F3B2B /* EmojiMemoryThemeChooser.swift */,
+				4425C942253441E900B4F19E /* ThemeEditor.swift */,
 			);
 			path = Memorizer;
 			sourceTree = "<group>";
@@ -180,6 +183,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44568A5D2507903300198005 /* Cardify.swift in Sources */,
+				4425C943253441E900B4F19E /* ThemeEditor.swift in Sources */,
 				44568A5B25078A4300198005 /* Pie.swift in Sources */,
 				44DC64812504DAA5001D841B /* AppDelegate.swift in Sources */,
 				44DC64832504DAA5001D841B /* SceneDelegate.swift in Sources */,

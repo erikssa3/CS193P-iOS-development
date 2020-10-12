@@ -12,8 +12,9 @@ let orange = UIColor.RGB(red: 255/255, green: 69/255, blue: 0/255, alpha: 1)
 let green = UIColor.RGB(red: 50/255, green: 205/255, blue: 50/255, alpha: 1)
 let red = UIColor.RGB(red: 139/255, green: 0/255, blue: 0/255, alpha: 1)
 let gray = UIColor.RGB(red: 220/255, green: 220/255, blue: 220/255, alpha: 1)
-let yellow = UIColor.RGB(red: 255/255, green: 255/255, blue: 0/255, alpha: 1)
+let yellow = UIColor.RGB(red: 217/255, green: 204/255, blue: 65/255, alpha: 1)
 let magneta = UIColor.RGB(red: 139/255, green: 0/255, blue: 139/255, alpha: 1)
+let blue = UIColor.RGB(red: 110/255, green: 106/255, blue: 184/255, alpha: 1)
 
 struct Theme: Codable, Identifiable {
     var id: UUID = UUID()

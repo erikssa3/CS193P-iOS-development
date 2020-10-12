@@ -11,9 +11,36 @@ import Foundation
 
 class EmojiMemoryThemeStore: ObservableObject {
     
-    @Published var themes: [Theme] = [
+    static let defaultThemes: [Theme] = [
         Theme(name: "Halloween", emojies: ["👻", "🎃", "🕷", "🔦", "🧙🏿‍♂️" ], color: orange, pairAmount: 2),
         Theme(name: "Times", emojies: ["🕐", "🕑", "🕖", "🕗", "🕡", "🕧"], color: gray, pairAmount: 6),
-        Theme(name: "Weather", emojies: ["☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨", "☀️", "🌥", "⛈", "🌨"], color: yellow, pairAmount: 4),
+        Theme(name: "Spooky Weather", emojies: ["☀️", "🌥", "⛈", "🌨", "👻", "🎃", "🕷"], color: yellow, pairAmount: 4),
     ]
+    
+    @Published var themes: [Theme] = EmojiMemoryThemeStore.defaultThemes
+    
+    func addEmojis(theme: Theme, newEmojis: String) {
+        let index = themes.firstIndex(matching: theme)!
+        let newEmojisArray: [String] = newEmojis.map( {String($0)} )
+        themes[index].emojies = themes[index].emojies + newEmojisArray
+    }
+    
+    func removeEmoji(theme: Theme, emoji: String) {
+        let index = themes.firstIndex(matching: theme)!
+        themes[index].emojies = themes[index].emojies.filter({ $0 != emoji })
+    }
+    
+    func renameTheme(theme: Theme, newName: String) {
+        let index = themes.firstIndex(matching: theme)!
+        themes[index].name = newName
+    }
+    
+    func setPairAmount(theme: Theme, pairCount: Int) {
+        let index = themes.firstIndex(matching: theme)!
+        themes[index].pairAmount = pairCount
+    }
+    
+    func addTheme(theme: Theme) {
+        themes.append(theme)
+    }
 }
